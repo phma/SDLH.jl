@@ -1,6 +1,6 @@
 module SDLH
 using Random,Base.Threads,Primes
-export bigPrime
+export bigSemiprime
 
 rng=RandomDevice()
 
@@ -41,6 +41,13 @@ function bigPrime(nbits::Integer)
     end
   end
   ret
+end
+
+function bigSemiprime(nbits::Integer)
+  # Returns two primes. If nbits<28, it's likely that b will be 5.
+  a=bigPrime(nbits÷2)
+  b=bigPrime(nbits-Base.top_set_bit(a))
+  a,b
 end
 
 end # module SDLH
