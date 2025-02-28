@@ -29,14 +29,16 @@ function bigAnyPrime(nbits::Integer)
 end
 
 function bigPrime(nbits::Integer)
-  bigFactor=bigAnyPrime(nbits)
   ret=big(0)
-  for i in 2:2:512
-    ret=bigFactor*i+1
-    if isprime(ret)
-      break
+  while ret==0
+    bigFactor=bigAnyPrime(nbits)
+    for i in 2:2:512
+      ret=bigFactor*i+1
+      if isprime(ret)
+	break
+      end
+      ret=big(0)
     end
-    ret=big(0)
   end
   ret
 end
