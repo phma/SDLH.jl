@@ -45,8 +45,15 @@ end
 
 function bigSemiprime(nbits::Integer)
   # Returns two primes. If nbits<28, it's likely that b will be 5.
-  a=bigPrime(nbits÷2)
-  b=bigPrime(nbits-Base.top_set_bit(a))
+  a=big(0)
+  b=big(0)
+  while true
+    a=bigPrime(nbits÷2)
+    b=bigPrime(nbits-Base.top_set_bit(a))
+    if (a-b)^2>a+b
+      break
+    end
+  end
   a,b
 end
 
