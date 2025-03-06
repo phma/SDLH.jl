@@ -57,4 +57,10 @@ function bigSemiprime(nbits::Integer)
   a,b
 end
 
+struct RSAKey
+  a	::BigInt
+  b	::BigInt
+  g	::BigInt
+end
+
 end # module SDLH
