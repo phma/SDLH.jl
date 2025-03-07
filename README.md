@@ -10,3 +10,5 @@ This is not intended for serious cryptography, for the following reasons:
 - Anyone in possession of a public key and a hash collision other than prepending null bytes can produce more hash collisions and factor the modulus.
 
 - It's much slower than the hash functions that split a message in blocks and feed them to a compression function.
+
+This is a response to a challenge by Ralf Senderek, who previously implemented SDLH in Python.
