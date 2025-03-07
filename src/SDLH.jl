@@ -1,6 +1,6 @@
 module SDLH
 using Random,Base.Threads,Primes
-export bigSemiprime
+export generateKey
 
 rng=RandomDevice()
 
@@ -95,7 +95,25 @@ the generator is raised.
 struct SDLHKey
   p	::BigInt
   q	::BigInt
-  g	::BigInt
+  g	::Int
+end
+
+function generateKey(nbits::Integer)
+  p=q=big(0)
+  g=0
+  while true
+    p,q=bigSemiprime(nbits)
+    for i in primes(2,16777213)
+      if i<p && i<q && isGenerator(i,p,q)
+        g=i
+        break
+      end
+    end
+    if g>0
+      break
+    end
+  end
+  SDLHKey(p,q,g)
 end
 
 end # module SDLH
