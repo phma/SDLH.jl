@@ -57,9 +57,44 @@ function bigSemiprime(nbits::Integer)
   a,b
 end
 
-struct RSAKey
-  a	::BigInt
-  b	::BigInt
+function isGenerator(g::Integer,p::Integer,q::Integer)
+  totient=lcm(p-1,q-1)
+  a=b=0
+  for i in 2:2:512
+    if p%i==1
+      a=i
+    end
+  end
+  for i in 2:2:512
+    if q%i==1
+      b=i
+    end
+  end
+  factors=[p÷a,q÷b]
+  for i in primes(2,509)
+    if a%i==0 || b%i==0
+      push!(factors,big(i))
+    end
+  end
+  m=p*q
+  ret=powermod(g,totient,q)==1
+  for i in factors
+    ret&=powermod(g,totient÷i,q)!=1
+  end
+  ret
+end
+
+"""
+    struct SDLHKey
+
+An SDLH key is similar to an RSA key, having two large primes whose product
+is the modulus; but unlike an RSA key, which has an exponent to which a message
+is raised, an SDLH key has a generator, and the message is the power to which
+the generator is raised.
+"""
+struct SDLHKey
+  p	::BigInt
+  q	::BigInt
   g	::BigInt
 end
 
