@@ -79,7 +79,7 @@ function isGenerator(g::Integer,p::Integer,q::Integer)
   m=p*q
   ret=powermod(g,totient,q)==1
   for i in factors
-    ret&=powermod(g,totient÷i,q)!=1
+    ret&=powermod(g,totient÷i,m)!=1
   end
   ret
 end
