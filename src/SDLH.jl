@@ -97,7 +97,7 @@ A secret key has both p and q prime. A public key has p semiprime and q=1.
 struct SDLHKey
   p	::BigInt
   q	::BigInt
-  g	::UInt64
+  g	::UInt32
 end
 
 function generateKey(nbits::Integer)
@@ -132,14 +132,14 @@ end
 
 function writeBigInt(file::IOStream,n::BigInt)
   nb=UInt32(nBytes(n))
-  write(file,hton(nb))
+  write(file,htol(nb))
   for i in 0:nb-1
     write(file,UInt8(n>>(i*8)&255))
   end
 end
 
 function readBigInt(file::IOStream)
-  nb=ntoh(read(file,UInt32))
+  nb=ltoh(read(file,UInt32))
   ret=big(0)
   bytes=read(file,nb)
   for i in reverse(bytes)
@@ -159,7 +159,7 @@ function writeKey(file::IOStream,key::SDLHKey)
   if sec
     writeBigInt(file,key.q)
   end
-  write(file,hton(key.g))
+  write(file,htol(key.g))
 end
 
 function writeKey(fileName::String,key::SDLHKey)
@@ -182,7 +182,7 @@ function readKey(file::IOStream)
   else
     q=big(0)
   end
-  g=ntoh(read(file,UInt64))
+  g=ltoh(read(file,UInt32))
   SDLHKey(p,q,g)
 end
 
