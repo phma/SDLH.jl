@@ -1,6 +1,6 @@
 module SDLH
 using Random,Base.Threads,Primes
-export generateKey,writeKey
+export generateKey,writeKey,readKey
 
 rng=RandomDevice()
 
@@ -138,6 +138,16 @@ function writeBigInt(file::IOStream,n::BigInt)
   end
 end
 
+function readBigInt(file::IOStream)
+  nb=ntoh(read(file,UInt32))
+  ret=big(0)
+  bytes=read(file,nb)
+  for i in reverse(bytes)
+    ret=(ret<<8)+i
+  end
+  ret
+end
+
 function writeKey(file::IOStream,key::SDLHKey)
   sec=isSecretKey(key)
   if sec
@@ -156,6 +166,31 @@ function writeKey(fileName::String,key::SDLHKey)
   file=open(fileName,"w")
   writeKey(file,key)
   close(file)
+end
+
+function readKey(file::IOStream)
+  magic=String(read(file,7))
+  if magic[1:4]=="SDLH"
+    p=readBigInt(file)
+  else
+    p=big(0)
+  end
+  if magic[5:7]=="sec"
+    q=readBigInt(file)
+  elseif magic[5:7]=="pub"
+    q=big(1)
+  else
+    q=big(0)
+  end
+  g=ntoh(read(file,UInt64))
+  SDLHKey(p,q,g)
+end
+
+function readKey(fileName::String)
+  file=open(fileName,"r")
+  key=readKey(file)
+  close(file)
+  key
 end
 
 end # module SDLH
