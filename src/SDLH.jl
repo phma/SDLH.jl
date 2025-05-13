@@ -1,6 +1,6 @@
 module SDLH
 using Random,Base.Threads,Primes
-export generateKey
+export generateKey,writeKey
 
 rng=RandomDevice()
 
@@ -91,11 +91,13 @@ An SDLH key is similar to an RSA key, having two large primes whose product
 is the modulus; but unlike an RSA key, which has an exponent to which a message
 is raised, an SDLH key has a generator, and the message is the power to which
 the generator is raised.
+
+A secret key has both p and q prime. A public key has p semiprime and q=1.
 """
 struct SDLHKey
   p	::BigInt
   q	::BigInt
-  g	::Int
+  g	::UInt64
 end
 
 function generateKey(nbits::Integer)
@@ -114,6 +116,46 @@ function generateKey(nbits::Integer)
     end
   end
   SDLHKey(p,q,g)
+end
+
+function publicKey(key::SDLHKey)
+  SDLHKey(key.p*key.q,1,key.g)
+end
+
+function isSecretKey(key::SDLHKey)
+  isprime(key.q) && isprime(key.p)
+end
+
+function nBytes(n::Integer)
+  (Base.top_set_bit(n)+7)÷8
+end
+
+function writeBigInt(file::IOStream,n::BigInt)
+  nb=UInt32(nBytes(n))
+  write(file,hton(nb))
+  for i in 0:nb-1
+    write(file,UInt8(n>>(i*8)&255))
+  end
+end
+
+function writeKey(file::IOStream,key::SDLHKey)
+  sec=isSecretKey(key)
+  if sec
+    write(file,"SDLHsec")
+  else
+    write(file,"SDLHpub")
+  end
+  writeBigInt(file,key.p)
+  if sec
+    writeBigInt(file,key.q)
+  end
+  write(file,hton(key.g))
+end
+
+function writeKey(fileName::String,key::SDLHKey)
+  file=open(fileName,"w")
+  writeKey(file,key)
+  close(file)
 end
 
 end # module SDLH
